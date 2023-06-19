@@ -221,8 +221,11 @@ button {
   flex-direction: row;
   justify-content: space-between;
   width: 100vw;
-  gap: 0.25rem;
+
   padding: 0.25rem 0.50rem 0;
+
+  position: absolute;
+  top: 0;
 
   opacity: 0.5;
 }
