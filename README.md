@@ -4,14 +4,22 @@
 [Ready to use application](https://stonermuch.com/)
 
 It's a simple app to track your smoking habits. It's a PWA, so you can install it on your phone and use it offline. It's also a Vue 3 app, so it's fast and responsive.
-Data is stored in your browser's IndexedDB ([Dexie](https://dexie.org/)), therefore it's not synced between devices automatically, but you can import and export in a readable json file.
+
+## Data storage and privacy 
+All your data is stored in your browser's IndexedDB ([Dexie](https://dexie.org)).
+
+There is no server-side action, only static files are hosted, so your data is not sent anywhere.
+
+You are encouraged to secure your exported data (e.g. between imports) yourself.
+
+Also you are encouraged to take full responsibility for your actions according to the local laws and not to smoke too much :)
 
 ## Features
-- [x] Add a new session
-- [x] Edit a session
-- [x] Delete a session
-- [x] Import sessions
-- [x] Export sessions
+- [x] Add a new puff
+- [x] Edit a puff
+- [x] Delete a puff
+- [x] Import database
+- [x] Export database
 
 ## Project Setup
 
