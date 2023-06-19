@@ -1,25 +1,17 @@
-# AmIAStonerYet
+# Stoner Much
 
-This template should help get you started developing with Vue 3 in Vite.
+## About
+[Ready to use application](https://stonermuch.com/)
 
-## Recommended IDE Setup
+It's a simple app to track your smoking habits. It's a PWA, so you can install it on your phone and use it offline. It's also a Vue 3 app, so it's fast and responsive.
+Data is stored in your browser's IndexedDB ([Dexie](https://dexie.org/)), therefore it's not synced between devices automatically, but you can import and export in a readable json file.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## Features
+- [x] Add a new session
+- [x] Edit a session
+- [x] Delete a session
+- [x] Import sessions
+- [x] Export sessions
 
 ## Project Setup
 

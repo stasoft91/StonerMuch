@@ -9,10 +9,12 @@ import { useObservable } from '@vueuse/rxjs'
 import { liveQuery } from 'dexie'
 import type { Ref } from 'vue'
 import PuffLogs from '@/components/PuffLogs.vue'
+import ModalHelp from '@/components/ModalHelp.vue'
 import ActionButton from '@/components/ActionButton.vue'
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {exportDB, importInto} from "dexie-export-import";
 import {VERSION} from "@/constants/constants";
+import { vOnLongPress } from '@vueuse/components'
 
 let intervalId :number;
 
@@ -27,6 +29,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => clearInterval(intervalId))
+
+const isModalOpen = ref(false);
 
 const settings = useObservable(liveQuery(() => db.settings.toArray()) as any) as Ref<
     Settings[]
@@ -87,6 +91,10 @@ const unsavedItemsCount = computed(() => {
     return puffsSorted.value.filter(puff => puff.timestamp > computedSettings.value.lastExport).length;
   } else return 0;
 })
+
+const onShowModalPress = () => {
+  isModalOpen.value = true;
+}
 </script>
 
 <template>
@@ -96,7 +104,7 @@ const unsavedItemsCount = computed(() => {
     <button class="btn-reset" @click="onClearDataBtnClick">Clear Data</button>
   </div>
   <header>
-    <h1>Stoner much <span class="micro-text-version">{{ VERSION }}</span></h1>
+    <h1 v-on-long-press.prevent="[onShowModalPress, {delay: 420, modifiers: { stop: true }}]">Stoner much <span class="micro-text-version">{{ VERSION }}</span></h1>
   </header>
 
   <main>
@@ -109,18 +117,37 @@ const unsavedItemsCount = computed(() => {
       <PuffLogs class="puff-logs" :puffs="puffsSorted" :key="rerenderId" />
     </div>
   </main>
+
+  <div v-if="isModalOpen" class="overlay">
+    <ModalHelp @close-modal="isModalOpen = false"></ModalHelp>
+  </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 header {
+  --underline-deg: 0deg;
+  --box-shadow-deg1: 62deg;
+  --box-shadow-deg2: 89deg;
+
   margin-top: 2rem;
   margin-bottom: 2rem;
-  text-shadow: -1px -1px 6px rgb(208, 214, 47, 0.6), 2px 2px 8px rgba(133, 214, 47, 0.6);
+
+  text-decoration: dashed;
+  text-decoration-thickness: 1px;
+  text-decoration-line: underline;
+  text-underline-offset: 0.25rem;
+
+  -moz-animation: main-animation 4.2s 0s infinite;
+  -webkit-animation: main-animation 4.2s 0s infinite;
+  -o-animation: main-animation 4.2s 0s infinite;
+  animation: main-animation 4.2s 0s infinite;
 }
 
 h1 {
   font-size: 2rem;
   font-weight: 400;
+  position: relative;
+  text-transform: capitalize;
 }
 
 main {
@@ -195,7 +222,20 @@ button {
   font-size: 0.5rem;
   opacity: 0.5;
 
-  position: relative;
-  top: -0.75rem;
+  top: 0.5rem;
+  right: -1rem;
+
+  position: absolute;
+}
+
+@keyframes main-animation {
+  @for $i from 0 through 100 {
+    #{$i * 1%} {
+      text-decoration-color: hsl($i*3.6deg 100% 75% / 42%);
+      text-shadow:
+          -1px -1px 6px hsl($i*3.6deg+62deg 67% 51% / 0.6),
+          2px 2px 8px hsl($i*3.6deg+89deg 67% 51% / 0.6);
+    }
+  }
 }
 </style>

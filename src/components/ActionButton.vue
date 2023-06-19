@@ -34,24 +34,22 @@ const checkIfSettingsAvailable = async () => {
   if ((await db.settings.count()) === 0) {
     alert('Hey! Long Press on button to change weight!')
 
-    db.settings.add({
+    await db.settings.add({
       id: 1,
       jointWeight: parseFloat(DEFAULT_SETTINGS.jointWeight),
       boltWeight: parseFloat(DEFAULT_SETTINGS.boltWeight),
       bongWeight: parseFloat(DEFAULT_SETTINGS.bongWeight)
     })
-
-    return;
   }
 }
 
-const onIncreaseWeight = () => {
-  checkIfSettingsAvailable()
+const onIncreaseWeight = async () => {
+  await checkIfSettingsAvailable()
   db.settings.update(1, { [props.icon + 'Weight']: props.weight + 0.1 })
 }
 
-const onDecreaseWeight = () => {
-  checkIfSettingsAvailable()
+const onDecreaseWeight = async () => {
+  await checkIfSettingsAvailable()
   db.settings.update(1, { [props.icon + 'Weight']: props.weight > 0 ? props.weight - 0.1 : 0 })
 }
 
@@ -61,6 +59,7 @@ const onSaveNewWeight = () => {
 
 const isEditMode = ref(false);
 
+//@ts-ignore
 const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
   weight: () => 0,
   icon: () => 'joint'
@@ -69,7 +68,11 @@ const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
 const addPuff = async (weight: number, icon: 'joint' | 'bolt' | 'bong') => {
   if (isEditMode.value) return;
 
-  checkIfSettingsAvailable()
+  if ((await db.settings.count()) === 0) {
+    await checkIfSettingsAvailable()
+
+    return;
+  }
 
   db.puffs.add({
     timestamp: getTime(subDays(new Date(), 0)),
@@ -80,7 +83,7 @@ const addPuff = async (weight: number, icon: 'joint' | 'bolt' | 'bong') => {
 
 const htmlRefHook = ref<HTMLElement | null>(null)
 
-const onChangeWeightLongPress = (_e: PointerEvent) => {
+const onChangeWeightLongPress = () => {
   isEditMode.value = true;
 }
 
@@ -93,7 +96,7 @@ onLongPress(
 
 <style scoped>
 .btn-puff {
-  background: linear-gradient(42deg, hsl(89, 67%, 81%), hsl(89, 67%, 93%), hsl(121, 67%, 92%), hsl(89, 67%, 96%), hsl(89, 67%, 80%));
+  background: linear-gradient(42deg, hsl(89, 67%, 88%), hsl(89, 67%, 94%), hsl(121, 67%, 98%), hsl(89, 67%, 96%), hsl(89, 67%, 82%));
   border: 1px solid #85d62fff;
   box-shadow: inset 0 0 4px hsl(155, 67%, 51%);
 

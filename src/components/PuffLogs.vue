@@ -6,7 +6,7 @@
       <div>
         <div v-for="puff in dayPuffs" :key="puff.timestamp" class="puff-entry">
           <div class="puff-actions">
-            <button @click="removePuff(puff.id)" class="remove-puff"><font-awesome-icon :icon="`fa-solid fa-trash-alt`" fixedWidth /></button>
+            <button @click="removePuff(puff.id!)" class="remove-puff"><font-awesome-icon :icon="`fa-solid fa-trash-alt`" fixedWidth /></button>
           </div>
           <p>
             <span class="icon">🕠</span>
@@ -28,8 +28,7 @@
                 v-on-long-press.prevent="[onChangeWeightLongPress, {delay: 420, modifiers: { stop: true }}]"
             >
               {{ puff.weight.toFixed(1) }}
-              <span>g</span>
-            </span>
+            </span><span>g</span>
           </p>
           <hr />
         </div>
@@ -54,13 +53,14 @@ type PuffLogsProps = {
   puffs: Puff[]
 }
 
+// @ts-ignore
 const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
   puffs: () => [] as Puff[],
 })
 
 const puffsByDay = computed(() => {
   if (!props.puffs?.length) {
-    return {}
+    return {} as Record<string, Puff[]>
   }
 
   return props.puffs.reduce((acc, puff) => {
@@ -80,12 +80,19 @@ const removePuff = (id: number) => {
 }
 
 const onChangeWeightLongPress = (e: PointerEvent) => {
-  const puffWeight = e.target?.getAttribute('data-weight')
+  const target = e.target as HTMLElement;
+
+  if (!(target instanceof HTMLElement)) {
+    alert ('Something went wrong :(')
+    return
+  }
+
+  const puffWeight = target.getAttribute('data-weight')
 
   const newWeight = prompt('New weight?', puffWeight)
 
   if (newWeight) {
-    const puffId = e.target?.getAttribute('data-id')
+    const puffId = target.getAttribute('data-id')
     if (puffId) {
       db.puffs.update(+puffId, { weight: +newWeight })
     }
