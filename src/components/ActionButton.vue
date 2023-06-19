@@ -23,33 +23,23 @@ import getTime from "date-fns/getTime";
 import subDays from "date-fns/subDays";
 import {nextTick, ref} from "vue";
 import {onLongPress} from "@vueuse/core";
-import {DEFAULT_SETTINGS} from "@/constants/constants";
 
 type PuffLogsProps = {
   weight: number;
   icon: 'joint' | 'bolt' | 'bong';
+  isDemoMode: boolean;
 }
 
-const checkIfSettingsAvailable = async () => {
-  if ((await db.settings.count()) === 0) {
-    alert('Hey! Long Press on button to change weight!')
+const emit = defineEmits(['click', 'longpress'])
 
-    await db.settings.add({
-      id: 1,
-      jointWeight: parseFloat(DEFAULT_SETTINGS.jointWeight),
-      boltWeight: parseFloat(DEFAULT_SETTINGS.boltWeight),
-      bongWeight: parseFloat(DEFAULT_SETTINGS.bongWeight)
-    })
-  }
-}
+const emitClick = () => emit('click')
+const emitLongPress = () => emit('longpress')
 
 const onIncreaseWeight = async () => {
-  await checkIfSettingsAvailable()
   db.settings.update(1, { [props.icon + 'Weight']: props.weight + 0.1 })
 }
 
 const onDecreaseWeight = async () => {
-  await checkIfSettingsAvailable()
   db.settings.update(1, { [props.icon + 'Weight']: props.weight > 0 ? props.weight - 0.1 : 0 })
 }
 
@@ -62,15 +52,17 @@ const isEditMode = ref(false);
 //@ts-ignore
 const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
   weight: () => 0,
-  icon: () => 'joint'
+  icon: () => 'joint',
+  isDemoMode: () => false
 })
 
 const addPuff = async (weight: number, icon: 'joint' | 'bolt' | 'bong') => {
+  emitClick();
+
   if (isEditMode.value) return;
+  if (props.isDemoMode) return;
 
   if ((await db.settings.count()) === 0) {
-    await checkIfSettingsAvailable()
-
     return;
   }
 
@@ -83,7 +75,14 @@ const addPuff = async (weight: number, icon: 'joint' | 'bolt' | 'bong') => {
 
 const htmlRefHook = ref<HTMLElement | null>(null)
 
-const onChangeWeightLongPress = () => {
+const onChangeWeightLongPress = async () => {
+  if (props.isDemoMode) return;
+
+  emitLongPress()
+
+  if ((await db.settings.count()) === 0) {
+    return;
+  }
   isEditMode.value = true;
 }
 

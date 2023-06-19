@@ -13,19 +13,29 @@ import ModalHelp from '@/components/ModalHelp.vue'
 import ActionButton from '@/components/ActionButton.vue'
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {exportDB, importInto} from "dexie-export-import";
-import {VERSION} from "@/constants/constants";
+import {DEFAULT_SETTINGS, VERSION} from "@/constants/constants";
 import { vOnLongPress } from '@vueuse/components'
 
 let intervalId :number;
 
 const rerenderId = ref(Math.random().toString(36).substring(3))
 
-onMounted(() => {
+onMounted(async () => {
   clearInterval(intervalId)
   intervalId = setInterval(() => {
-    // update the time every second
+    // update the time every minute
     rerenderId.value = Math.random().toString(36).substring(3)
   }, 1000 * 60)
+
+  if ((await db.settings.count()) === 0) {
+    isModalOpen.value = true;
+    await db.settings.add({
+      id: 1,
+      jointWeight: parseFloat(DEFAULT_SETTINGS.jointWeight),
+      boltWeight: parseFloat(DEFAULT_SETTINGS.boltWeight),
+      bongWeight: parseFloat(DEFAULT_SETTINGS.bongWeight)
+    })
+  }
 })
 
 onUnmounted(() => clearInterval(intervalId))
@@ -52,10 +62,11 @@ const puffsSorted = useObservable(
   ) as any
 ) as Ref<Puff[]>
 
-const onClearDataBtnClick = () => {
+const onClearDataBtnClick = async () => {
   if (confirm('Are you sure?')) {
-    db.puffs.clear()
-    db.settings.clear()
+    await db.puffs.clear()
+    await db.settings.clear()
+    window.location.reload()
   }
 }
 
@@ -129,8 +140,8 @@ header {
   --box-shadow-deg1: 62deg;
   --box-shadow-deg2: 89deg;
 
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 
   text-decoration: dashed;
   text-decoration-thickness: 1px;
@@ -148,6 +159,7 @@ h1 {
   font-weight: 400;
   position: relative;
   text-transform: capitalize;
+  cursor: pointer;
 }
 
 main {
@@ -209,11 +221,8 @@ button {
   flex-direction: row;
   justify-content: space-between;
   width: 100vw;
-
+  gap: 0.25rem;
   padding: 0.25rem 0.50rem 0;
-
-  position: absolute;
-  top: 0;
 
   opacity: 0.5;
 }

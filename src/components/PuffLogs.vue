@@ -198,7 +198,7 @@ h3 {
   cursor: pointer;
   line-height: 1.5rem;
   text-decoration: underline;
-  text-decoration-color: #2fd69099;
+  text-decoration-color: #2fd690ff;
   text-decoration-thickness: 1px;
   text-decoration-style: dashed;
   text-underline-offset: 0.15rem;
