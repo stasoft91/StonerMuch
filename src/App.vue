@@ -224,9 +224,6 @@ button {
 
   padding: 0.25rem 0.50rem 0;
 
-  position: absolute;
-  top: 0;
-
   opacity: 0.5;
 }
 
