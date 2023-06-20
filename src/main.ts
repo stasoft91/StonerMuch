@@ -8,12 +8,12 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 /* import specific icons */
-import { faJoint, faCannabis, faBong, faBolt, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faJoint, faCannabis, faBong, faBolt, faTrashAlt, faHourglassHalf, faTemperatureHalf, faNoteSticky } from '@fortawesome/free-solid-svg-icons'
 // @ts-ignore
 import { registerSW } from 'virtual:pwa-register'
 
 /* add icons to the library */
-library.add(faJoint, faCannabis, faBong, faBolt, faTrashAlt)
+library.add(faJoint, faCannabis, faBong, faBolt, faTrashAlt, faHourglassHalf, faTemperatureHalf, faNoteSticky)
 
 const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon)
 

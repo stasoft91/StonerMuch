@@ -27,7 +27,7 @@ import {onLongPress} from "@vueuse/core";
 type PuffLogsProps = {
   weight: number;
   icon: 'joint' | 'bolt' | 'bong';
-  isDemoMode: boolean;
+  isDemoMode?: boolean;
 }
 
 const emit = defineEmits(['click', 'longpress'])
@@ -69,7 +69,9 @@ const addPuff = async (weight: number, icon: 'joint' | 'bolt' | 'bong') => {
   db.puffs.add({
     timestamp: getTime(subDays(new Date(), 0)),
     weight,
-    icon
+    icon,
+    temperature: parseInt(localStorage.getItem('temperature')) || 0,
+    note: ''
   })
 }
 

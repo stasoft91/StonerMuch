@@ -35,6 +35,8 @@ onMounted(async () => {
       boltWeight: parseFloat(DEFAULT_SETTINGS.boltWeight),
       bongWeight: parseFloat(DEFAULT_SETTINGS.bongWeight)
     })
+
+    localStorage.setItem('temperature', '175');
   }
 })
 
@@ -66,6 +68,7 @@ const onClearDataBtnClick = async () => {
   if (confirm('Are you sure?')) {
     await db.puffs.clear()
     await db.settings.clear()
+    localStorage.clear()
     window.location.reload()
   }
 }
@@ -91,7 +94,12 @@ const onImportDataBtnClick = async () => {
   fileInput.onchange = async () => {
     if (fileInput?.files && fileInput.files.length > 0) {
       const file = fileInput?.files[0];
-      await importInto(db, file);
+
+      if (file) {
+        db.puffs.clear();
+        db.settings.clear();
+        await importInto(db, file);
+      }
     }
   };
   fileInput.click();

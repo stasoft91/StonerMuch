@@ -6,6 +6,8 @@ export interface Puff {
   timestamp: number
   weight: number
   icon?: 'joint' | 'bong' | 'bolt'
+  temperature?: number
+  note?: string
 }
 export interface Settings {
   id?: number
@@ -25,7 +27,7 @@ export class DexieDB extends Dexie {
     super('pufflogger')
 
     this.version(3).stores({
-      puffs: '++id, timestamp, weight, icon', // Primary key and indexed props
+      puffs: '++id, timestamp, weight, icon, temperature, note', // Primary key and indexed props
       settings: '++id, lastExport, jointWeight, boltWeight, bongWeight' // Primary key and indexed props
     })
   }
