@@ -30,7 +30,7 @@
                   class="editable"
                   v-on-long-press.prevent="[onChangeWeightLongPress, {delay: 420, modifiers: { stop: true }}]"
               >
-                {{ puff.weight.toFixed(1) }}<span>&nbsp;g</span>
+                {{ puff.weight.toFixed(1) }}&nbsp;g
               </span>
             </span>
 
