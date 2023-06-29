@@ -5,7 +5,7 @@ export interface Puff {
   id?: number
   timestamp: number
   weight: number
-  icon?: 'joint' | 'bong' | 'bolt'
+  icon?: UsageTypesEnum
   temperature?: number
   note?: string
 }

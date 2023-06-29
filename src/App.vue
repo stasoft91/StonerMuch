@@ -15,8 +15,9 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 import {exportDB, importInto} from "dexie-export-import";
 import {DEFAULT_SETTINGS, VERSION} from "@/constants/constants";
 import { vOnLongPress } from '@vueuse/components'
+import { UsageTypesEnum } from "@/types/types";
 
-let intervalId :number;
+let intervalId: number;
 
 const rerenderId = ref(Math.random().toString(36).substring(3))
 
@@ -28,7 +29,7 @@ onMounted(async () => {
   }, 1000 * 60)
 
   if ((await db.settings.count()) === 0) {
-    isModalOpen.value = true;
+    isHelpModalOpen.value = true;
     await db.settings.add({
       id: 1,
       jointWeight: parseFloat(DEFAULT_SETTINGS.jointWeight),
@@ -42,7 +43,9 @@ onMounted(async () => {
 
 onUnmounted(() => clearInterval(intervalId))
 
-const isModalOpen = ref(false);
+const isHelpModalOpen = ref(false);
+const isChangeTimeModalOpen = ref(false);
+let puffToBeEdited = null;
 
 const settings = useObservable(liveQuery(() => db.settings.toArray()) as any) as Ref<
     Settings[]
@@ -107,13 +110,23 @@ const onImportDataBtnClick = async () => {
 
 const unsavedItemsCount = computed(() => {
   if (computedSettings.value.lastExport) {
-    return puffsSorted.value.filter(puff => puff.timestamp > computedSettings.value.lastExport).length;
+    return puffsSorted.value?.filter(puff => puff.timestamp > computedSettings.value.lastExport).length || 0;
   } else return 0;
 })
 
 const onShowModalPress = () => {
-  isModalOpen.value = true;
+  isHelpModalOpen.value = true;
 }
+
+const openChangeTimeDialog = (puff: Puff) => {
+  puffToBeEdited = puff;
+  isChangeTimeModalOpen.value = true;
+}
+
+const onChangeTime = (puff: Puff) => {
+  db.puffs.update(puff.id, {timestamp: puff.timestamp});
+}
+
 </script>
 
 <template>
@@ -128,17 +141,21 @@ const onShowModalPress = () => {
 
   <main>
     <div class="button-wrapper">
-      <ActionButton :icon="'joint'" :weight="computedSettings.jointWeight"></ActionButton>
-      <ActionButton :icon="'bolt'" :weight="computedSettings.boltWeight"></ActionButton>
-      <ActionButton :icon="'bong'" :weight="computedSettings.bongWeight"></ActionButton>
+      <ActionButton :icon="UsageTypesEnum.joint" :weight="computedSettings.jointWeight"></ActionButton>
+      <ActionButton :icon="UsageTypesEnum.bolt" :weight="computedSettings.boltWeight"></ActionButton>
+      <ActionButton :icon="UsageTypesEnum.bong" :weight="computedSettings.bongWeight"></ActionButton>
     </div>
     <div class="flex">
-      <PuffLogs class="puff-logs" :puffs="puffsSorted" :key="rerenderId" />
+      <PuffLogs class="puff-logs" :puffs="puffsSorted" :rerenderKey="rerenderId" @change-time="openChangeTimeDialog"/>
     </div>
   </main>
 
-  <div v-if="isModalOpen" class="overlay">
-    <ModalHelp @close-modal="isModalOpen = false"></ModalHelp>
+  <div v-if="isHelpModalOpen" class="overlay">
+    <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
+  </div>
+
+  <div v-if="isChangeTimeModalOpen" class="overlay">
+    <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangeTime" ></ModalHelp>
   </div>
 </template>
 

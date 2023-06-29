@@ -1,0 +1,1 @@
+node ./update-app-version.cjs && vite build && rcp -r dist/* stonermuch.ru:~/www/stonermuch.com

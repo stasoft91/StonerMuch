@@ -12,7 +12,7 @@ There is no server-side action, only static files are hosted, so your data is no
 
 You are encouraged to secure your exported data (e.g. between imports) yourself.
 
-Also you are encouraged to take full responsibility for your actions according to the local laws and not to smoke too much :)
+Also mind your local laws and your health :)
 
 ## Features
 - [x] Add a new puff

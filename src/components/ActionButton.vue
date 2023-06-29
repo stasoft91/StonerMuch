@@ -23,10 +23,12 @@ import getTime from "date-fns/getTime";
 import subDays from "date-fns/subDays";
 import {nextTick, ref} from "vue";
 import {onLongPress} from "@vueuse/core";
+import type { UsageTypesEnum } from "@/types/types";
+
 
 type PuffLogsProps = {
   weight: number;
-  icon: 'joint' | 'bolt' | 'bong';
+  icon: UsageTypesEnum;
   isDemoMode?: boolean;
 }
 
@@ -49,14 +51,13 @@ const onSaveNewWeight = () => {
 
 const isEditMode = ref(false);
 
-//@ts-ignore
 const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
   weight: () => 0,
-  icon: () => 'joint',
+  icon: () => UsageTypesEnum.joint,
   isDemoMode: () => false
 })
 
-const addPuff = async (weight: number, icon: 'joint' | 'bolt' | 'bong') => {
+const addPuff = async (weight: number, icon: UsageTypesEnum) => {
   emitClick();
 
   if (isEditMode.value) return;

@@ -1,5 +1,5 @@
 {
-  "name": "amiastoneryet",
+  "name": "stonermuch.com",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "generate-pwa-assets": "pwa-assets-generator",
-    "release": "node ./update-app-version.cjs && vite build && rcp -r dist/* stonermuch.com:~/www/stonermuch.com"
+    "release": "./release.sh"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",

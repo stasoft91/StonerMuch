@@ -1,29 +1,38 @@
 <template>
   <div class="logs-wrapper">
     <div v-for="(dayPuffs, date) in puffsByDay" :key="date" class="day-logs">
-      <h3>{{ date }}</h3>
+      <h3>
+        {{ date }}
+        <span v-if="differenceInCalendarDays(dayPuffs[0]?.timestamp, new Date()) < 0" class="small">
+          ({{
+            formatDistanceToNowStrict(new Date(dayPuffs[0]?.timestamp))
+          }} ago)
+        </span>
+      </h3>
 
       <div>
         <div v-for="puff in dayPuffs" :key="puff.timestamp" class="puff-entry">
           <p class="parameters">
             <span class="parameter">
-              <span class="icon">🕠</span>
-              <span>{{ format(puff.timestamp, 'HH:mm') }}</span>
+              <span class="icon"><font-awesome-icon :icon="`fa-solid fa-clock-four`" fixedWidth /></span>
+              <span
+                  class="editable"
+                  v-on-long-press.prevent="[() => emit('changeTime', puff), {delay: 420, modifiers: { stop: true }}]"
+              >{{ format(puff.timestamp, 'HH:mm') }}</span>
             </span>
             <span class="puff-actions">
               <button @click="removePuff(puff.id!)" class="remove-puff"><font-awesome-icon :icon="`fa-solid fa-trash-alt`" fixedWidth /></button>
             </span>
           </p>
-          <p>
+          <p v-if="isFormatDistanceToNowVisible(puff.timestamp)">
             <span class="icon"><font-awesome-icon :icon="`fa-solid fa-hourglass-half`" fixedWidth /></span>
-            <span>{{ formatDistanceToNow(puff.timestamp) }} ago</span>
+            <span :key="`${props.rerenderKey}.${puff.id}`">{{ formatDistanceToNow(puff.timestamp) }} ago</span>
           </p>
           <p class="parameters">
             <span class="parameter">
-              <span v-if="puff.icon" class="icon">
-                <font-awesome-icon :icon="`fa-solid fa-${puff.icon}`" fixedWidth />
+              <span class="icon" :class="getIconStyleClasses(puff.icon)">
+                <font-awesome-icon :icon="puff.icon" fixedWidth />
               </span>
-              <span v-if="!puff.icon" class="icon">⚖️</span>
               <span
                   :data-id="puff.id"
                   :data-weight="puff.weight.toFixed(1)"
@@ -73,20 +82,32 @@
 
 <script setup lang="ts">
 import {computed} from 'vue'
-import type { Puff } from '@/database/db'
-import format from 'date-fns/format'
-import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import type {Puff} from '@/database/db'
 import {db} from "@/database/db";
-import { vOnLongPress } from '@vueuse/components'
+import format from 'date-fns/format'
+import compareAsc from 'date-fns/compareAsc'
+import startOfToday from 'date-fns/startOfToday'
+import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
+import {vOnLongPress} from '@vueuse/components'
+import {formatDistanceToNowStrict} from "date-fns";
+import {UsageTypesEnum} from "@/types/types";
+
+const emit = defineEmits(['changeTime'])
 
 type PuffLogsProps = {
-  puffs: Puff[]
+  puffs: Puff[],
+  rerenderKey: string
 }
 
-// @ts-ignore
 const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
   puffs: () => [] as Puff[],
+  rerenderKey: () => ''
 })
+
+const isFormatDistanceToNowVisible = (timestamp: number) => {
+  return compareAsc(startOfToday(new Date), new Date(timestamp)) === -1
+}
 
 const puffsByDay = computed(() => {
   if (!props.puffs?.length) {
@@ -170,6 +191,12 @@ const onChangeWeightLongPress = (e: PointerEvent) => {
       db.puffs.update(+puffId, { weight: +newWeight })
     }
   }
+}
+
+const getIconStyleClasses = (icon: UsageTypesEnum): string => {
+  // fix positioning of icon for bong
+  return (icon === UsageTypesEnum.bong) ? `fix-bong-icon` : ''
+
 }
 </script>
 
@@ -267,6 +294,11 @@ h3 {
   align-items: center;
 }
 
+.fix-bong-icon {
+  position: relative;
+  left: 1px;
+}
+
 .editable {
   cursor: pointer;
   line-height: 1.5rem;
@@ -302,5 +334,9 @@ p.parameters {
 
 .parameters.justify-center .parameter {
   flex-wrap: nowrap;
+}
+
+.small {
+  font-size: 0.8rem;
 }
 </style>
