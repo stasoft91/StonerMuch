@@ -11,7 +11,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "generate-pwa-assets": "pwa-assets-generator",
-    "release": "./release.sh"
+    "release": "build-release.sh"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
