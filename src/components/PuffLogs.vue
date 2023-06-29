@@ -4,17 +4,18 @@
       <h3>
         {{ date }}
         <span v-if="differenceInCalendarDays(dayPuffs[0]?.timestamp, new Date()) < 0" class="small">
-          ({{
+          {{
             formatDistanceToNowStrict(new Date(dayPuffs[0]?.timestamp))
-          }} ago)
+          }} ago
         </span>
+        <span v-else class="small">Today</span>
       </h3>
 
       <div>
         <div v-for="puff in dayPuffs" :key="puff.timestamp" class="puff-entry">
           <p class="parameters">
             <span class="parameter">
-              <span class="icon"><font-awesome-icon :icon="`fa-solid fa-clock-four`" fixedWidth /></span>
+              <span class="icon"><font-awesome-icon icon="fa-solid fa-clock-four fix-left-position" fixedWidth /></span>
               <span
                   class="editable"
                   v-on-long-press.prevent="[() => emit('changeTime', puff), {delay: 420, modifiers: { stop: true }}]"
@@ -58,7 +59,6 @@
           <p class="parameters justify-center" :class="{'flex-start':puff.note}">
             <span class="parameter">
               <span class="icon"><font-awesome-icon :icon="`fa-solid fa-note-sticky`" fixedWidth/></span>
-
               <span
                   :data-id="puff.id"
                   :data-note="puff.note"
@@ -195,7 +195,7 @@ const onChangeWeightLongPress = (e: PointerEvent) => {
 
 const getIconStyleClasses = (icon: UsageTypesEnum): string => {
   // fix positioning of icon for bong
-  return (icon === UsageTypesEnum.bong) ? `fix-bong-icon` : ''
+  return (icon === UsageTypesEnum.bong) ? `fix-left-position` : ''
 
 }
 </script>
@@ -294,7 +294,7 @@ h3 {
   align-items: center;
 }
 
-.fix-bong-icon {
+.fix-left-position {
   position: relative;
   left: 1px;
 }
@@ -337,6 +337,6 @@ p.parameters {
 }
 
 .small {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 </style>
