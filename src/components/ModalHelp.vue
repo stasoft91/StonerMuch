@@ -12,8 +12,8 @@
 
       <h3>How to use</h3>
       <ul>
-        <li>Press <ActionButton class="miniature" is-demo-mode :icon="demoPuffIcon" /> to add a puff</li>
-        <li>Press and hold <ActionButton class="miniature" is-demo-mode :icon="demoPuffIcon" /> to edit bowl size</li>
+        <li>Press <ActionButton class="miniature" is-demo-mode :icon="demoPuffIcon" :weight="0"/> to add a puff</li>
+        <li>Press and hold <ActionButton class="miniature" is-demo-mode :icon="demoPuffIcon" :weight="0" /> to edit bowl size</li>
 
         <li>Press <span class="trash-icon"><font-awesome-icon :icon="`fa-solid fa-trash-alt`" fixedWidth /></span> to remove a puff</li>
         <li>Press and hold on <span class="editable">puff`s weight</span> to change it</li>
@@ -30,7 +30,7 @@
 
       <h2>Change time</h2>
 
-      <input type="time" v-model="timeHM" @change="() => emit('change-time', {...props.puff, timestamp: getTime(parse(timeHM, 'HH:mm', new Date(props.puff?.timestamp)))})"/>
+      <input type="time" v-model="timeHM" @change="() => emit('change-time', {...props.puff, timestamp: getTime(parse(timeHM, 'HH:mm', new Date(props.puff?.timestamp || '')))})"/>
       <button v-if="originalTimeHM !== timeHM" @click="onRevertTime">Revert</button>
     </div>
   </div>
@@ -38,12 +38,13 @@
 
 <script setup lang="ts">
 import ActionButton from './ActionButton.vue'
-import {onMounted, onUnmounted, ref} from "vue";
+import {onMounted, onUnmounted, Ref, ref} from "vue";
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
 import getTime from 'date-fns/getTime'
 
 import type {Puff} from "@/database/db";
+import {UsageTypesEnum} from "@/types/types";
 const emit = defineEmits(['close-modal', 'change-time'])
 
 type ModalProps = {
@@ -57,7 +58,7 @@ const props: ModalProps = withDefaults(defineProps<ModalProps>(), {
 
 const emitCloseModal = () => emit('close-modal')
 
-const demoPuffIcon = ref(UsageTypesEnum.joint)
+const demoPuffIcon: Ref<UsageTypesEnum> = ref(UsageTypesEnum.joint)
 
 const timeHM = ref('');
 const originalTimeHM = ref('');
@@ -66,8 +67,11 @@ let interval;
 
 
 onMounted(() => {
-  originalTimeHM.value = format(props.puff?.timestamp, 'HH:mm') ?? '';
-  timeHM.value = format(props.puff?.timestamp, 'HH:mm') ?? '';
+  if (props.puff) {
+    originalTimeHM.value = format(props.puff?.timestamp, 'HH:mm') ?? '';
+    timeHM.value = format(props.puff?.timestamp, 'HH:mm') ?? '';
+  }
+
   rotateIcons()
 })
 
@@ -77,12 +81,13 @@ onUnmounted(() => {
 
 //rotate icons each second
 const rotateIcons = () => {
-  const icons = Usa
+  const icons = Object.values(UsageTypesEnum);
+
   let i = 0
-  interval =setInterval(() => {
-    demoPuffIcon.value = icons[i]
-    i = i === 2 ? 0 : i + 1
-  }, 1000)
+  interval = setInterval(() => {
+        demoPuffIcon.value = <UsageTypesEnum>icons[i];
+        i = (i === 2) ? 0 : (i + 1)
+      },1000)
 }
 
 const onRevertTime = () => {
