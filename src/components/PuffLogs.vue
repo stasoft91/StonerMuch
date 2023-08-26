@@ -125,7 +125,7 @@ const puffsByDay = computed(() => {
 })
 
 const removePuff = (id: number) => {
-  if (confirm('Are you sure want to delete this puff?')) {
+  if (confirm('Delete this puff?')) {
     db.puffs.delete(id)
   }
 }

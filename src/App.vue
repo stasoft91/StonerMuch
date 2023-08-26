@@ -130,32 +130,34 @@ const onChangeTime = (puff: Puff) => {
 </script>
 
 <template>
-  <div class="settings-wrapper">
-    <button class="btn-export" @click="onExportDataBtnClick">Export Data{{unsavedItemsCount ? ` (+${unsavedItemsCount})` : ''}}</button>
-    <button class="btn-import" @click="onImportDataBtnClick">Import Data</button>
-    <button class="btn-reset" @click="onClearDataBtnClick">Clear Data</button>
-  </div>
-  <header>
-    <h1 v-on-long-press.prevent="[onShowModalPress, {delay: 420, modifiers: { stop: true }}]">Stoner much <span class="micro-text-version">{{ VERSION }}</span></h1>
-  </header>
-
-  <main>
-    <div class="button-wrapper">
-      <ActionButton :icon="UsageTypesEnum.joint" :weight="computedSettings.jointWeight"></ActionButton>
-      <ActionButton :icon="UsageTypesEnum.bolt" :weight="computedSettings.boltWeight"></ActionButton>
-      <ActionButton :icon="UsageTypesEnum.bong" :weight="computedSettings.bongWeight"></ActionButton>
+  <div class="wrapper">
+    <div class="settings-wrapper">
+      <button class="btn-export" @click="onExportDataBtnClick">Export Data{{unsavedItemsCount ? ` (+${unsavedItemsCount})` : ''}}</button>
+      <button class="btn-import" @click="onImportDataBtnClick">Import Data</button>
+      <button class="btn-reset" @click="onClearDataBtnClick">Clear Data</button>
     </div>
-    <div class="flex">
-      <PuffLogs class="puff-logs" :puffs="puffsSorted" :rerenderKey="rerenderId" @change-time="openChangeTimeDialog"/>
+    <header>
+      <h1 v-on-long-press.prevent="[onShowModalPress, {delay: 420, modifiers: { stop: true }}]">Stoner much <span class="micro-text-version">{{ VERSION }}</span></h1>
+    </header>
+
+    <main>
+      <div class="button-wrapper">
+        <ActionButton :icon="UsageTypesEnum.joint" :weight="computedSettings.jointWeight"></ActionButton>
+        <ActionButton :icon="UsageTypesEnum.bolt" :weight="computedSettings.boltWeight"></ActionButton>
+        <ActionButton :icon="UsageTypesEnum.bong" :weight="computedSettings.bongWeight"></ActionButton>
+      </div>
+      <div class="flex">
+        <PuffLogs class="puff-logs" :puffs="puffsSorted" :rerenderKey="rerenderId" @change-time="openChangeTimeDialog"/>
+      </div>
+    </main>
+
+    <div v-if="isHelpModalOpen" class="overlay">
+      <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
     </div>
-  </main>
 
-  <div v-if="isHelpModalOpen" class="overlay">
-    <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
-  </div>
-
-  <div v-if="isChangeTimeModalOpen" class="overlay">
-    <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangeTime" ></ModalHelp>
+    <div v-if="isChangeTimeModalOpen" class="overlay">
+      <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangeTime" ></ModalHelp>
+    </div>
   </div>
 </template>
 
@@ -179,6 +181,22 @@ header {
   animation: main-animation 4.2s 0s infinite;
 }
 
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  justify-items: center;
+  align-content: space-between;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  & > * {
+    max-width: 1280px;
+  }
+}
+
 h1 {
   font-size: 2rem;
   font-weight: 400;
@@ -193,6 +211,7 @@ main {
   align-items: center;
   justify-content: space-between;
   overflow: hidden;
+  height: 100%;
 }
 
 .btn-reset, .btn-export, .btn-import {
@@ -229,6 +248,7 @@ button {
   flex-wrap: wrap;
   width: 100vw;
   overflow: hidden;
+  height: 100%;
 }
 
 .button-wrapper {

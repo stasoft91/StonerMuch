@@ -1,4 +1,4 @@
-export const VERSION = '0.33';
+export const VERSION = '0.34';
 
 export const DEFAULT_SETTINGS = {
     jointWeight: '0.3',
