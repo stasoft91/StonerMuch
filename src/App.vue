@@ -150,14 +150,12 @@ const onChangeTime = (puff: Puff) => {
         <PuffLogs class="puff-logs" :puffs="puffsSorted" :rerenderKey="rerenderId" @change-time="openChangeTimeDialog"/>
       </div>
     </main>
-
-    <div v-if="isHelpModalOpen" class="overlay">
-      <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
-    </div>
-
-    <div v-if="isChangeTimeModalOpen" class="overlay">
-      <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangeTime" ></ModalHelp>
-    </div>
+  </div>
+  <div v-if="isHelpModalOpen" class="overlay">
+    <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
+  </div>
+  <div v-if="isChangeTimeModalOpen" class="overlay">
+    <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangeTime" ></ModalHelp>
   </div>
 </template>
 
@@ -247,6 +245,7 @@ button {
   justify-content: space-evenly;
   flex-wrap: wrap;
   width: 100vw;
+  max-width: 1280px;
   overflow: hidden;
   height: 100%;
 }
@@ -256,6 +255,7 @@ button {
   flex-direction: row;
   justify-content: space-evenly;
   width: 100vw;
+  max-width: 1280px;
   gap: 0.25rem;
 
   margin: 0.25rem 0;
@@ -266,6 +266,7 @@ button {
   flex-direction: row;
   justify-content: space-between;
   width: 100vw;
+  max-width: 720px;
 
   padding: 0.25rem 0.50rem 0;
 
