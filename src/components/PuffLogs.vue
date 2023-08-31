@@ -106,7 +106,7 @@ const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
 })
 
 const isFormatDistanceToNowVisible = (timestamp: number) => {
-  return compareAsc(startOfToday(new Date), new Date(timestamp)) === -1
+  return compareAsc(startOfToday(), new Date(timestamp)) === -1
 }
 
 const puffsByDay = computed(() => {
@@ -140,16 +140,11 @@ const onChangeNoteLongPress = (e: PointerEvent) => {
 
   const puffNote = target.getAttribute('data-note') || ''
 
-  let newNote = prompt('New note?', puffNote)
+  let newNote = prompt('New note?', puffNote) ?? ''
 
   const puffId = target.getAttribute('data-id')
 
-  // if (newNote.trim().length > 10) {
-  //   alert('Note is too long, truncating to 10 characters');
-  //   newNote = newNote.trim().substring(0, 10);
-  // }
-
-  db.puffs.update(+puffId, { note: newNote.trim() })
+  db.puffs.update(+puffId!, { note: newNote.trim() })
 }
 
 const onChangeTemperatureLongPress = (e: PointerEvent) => {
@@ -193,10 +188,9 @@ const onChangeWeightLongPress = (e: PointerEvent) => {
   }
 }
 
-const getIconStyleClasses = (icon: UsageTypesEnum): string => {
+const getIconStyleClasses = (icon?: UsageTypesEnum): string => {
   // fix positioning of icon for bong
   return (icon === UsageTypesEnum.bong) ? `fix-left-position` : ''
-
 }
 </script>
 

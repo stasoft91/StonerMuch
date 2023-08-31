@@ -93,7 +93,6 @@ const onExportDataBtnClick = async () => {
 const onImportDataBtnClick = async () => {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
-  fileInput.accept = '.json';
   fileInput.onchange = async () => {
     if (fileInput?.files && fileInput.files.length > 0) {
       const file = fileInput?.files[0];
