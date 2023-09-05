@@ -1,21 +1,5 @@
 @import 'base.scss';
 
-#app {
-  font-weight: normal;
-  height: 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  background-color: #282c34;
-  color: #fff;
-  padding: 0 0.5rem 0.5rem;
-
-  font-family: 'Roboto', sans-serif;
-}
-
 .overlay {
     position: fixed;
     top: 0;
@@ -42,4 +26,25 @@
 
 a {
     color: #D62F75CD;
+}
+
+#app {
+    font-weight: normal;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #282c34;
+    color: #fff;
+    padding: 0 0.5rem 0.5rem;
+
+    font-family: 'Anonymous Pro', monospace;
+    font-size: 1rem;
+}
+
+input, button {
+    font-family: 'Anonymous Pro', monospace;
 }

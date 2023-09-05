@@ -116,7 +116,7 @@ display: flex;
 }
 
 .weight {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 400;
   align-self: end;
   position: relative;
@@ -132,7 +132,7 @@ display: flex;
 }
 
 .puff-actions span {
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 400;
 }
 

@@ -53,7 +53,7 @@
               >
                 {{ Math.abs(puff.temperature || 0) }}°
               </span>
-              <font-awesome-icon :icon="`fa-solid fa-temperature-half`"/>
+              <font-awesome-icon icon="fa-solid fa-temperature-half"/>
             </span>
           </p>
           <p class="parameters justify-center" :class="{'flex-start':puff.note}">
@@ -115,7 +115,7 @@ const puffsByDay = computed(() => {
   }
 
   return props.puffs.reduce((acc, puff) => {
-    const day = format(puff.timestamp, 'dd LLLL')
+    const day = format(puff.timestamp, 'dd LLL')
     if (!acc[day]) {
       acc[day] = []
     }
@@ -155,7 +155,7 @@ const onChangeTemperatureLongPress = (e: PointerEvent) => {
     return
   }
 
-  const puffTemperature = parseInt(target.getAttribute('data-temperature'))
+  const puffTemperature = parseInt(target.getAttribute('data-temperature') || '0')
 
   const newTemperature = prompt('New temperature?', puffTemperature.toString())
 
@@ -176,7 +176,7 @@ const onChangeWeightLongPress = (e: PointerEvent) => {
     return
   }
 
-  const puffWeight = target.getAttribute('data-weight')
+  const puffWeight = target.getAttribute('data-weight') || '0'
 
   const newWeight = prompt('New weight?', puffWeight)
 
@@ -200,7 +200,11 @@ const getIconStyleClasses = (icon?: UsageTypesEnum): string => {
   overflow-y: auto;
   height: 100%;
   width: clamp(400rem/16, 50%, 100% - 1rem);
+  padding: 1rem;
 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .day-logs {
@@ -212,18 +216,15 @@ h3 {
   font-size: 1.5rem;
   font-weight: 400;
   color: #85d62fff;
-  margin-left: 1rem;
 }
 
 .puff-entry {
-  margin: 1rem 0;
+  margin-bottom: 0.5rem;
 }
 
 .puff-entry p {
   font-family: monospace;
   font-size: 1rem;
-
-  margin: 0 1rem;
 
   display: flex;
   flex-direction: row;
@@ -253,8 +254,7 @@ h3 {
 .total {
   display: flex;
   justify-content: flex-end;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .total p {
@@ -331,6 +331,6 @@ p.parameters {
 }
 
 .small {
-  font-size: 0.75rem;
+  font-size: 0.80rem;
 }
 </style>

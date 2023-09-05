@@ -10,8 +10,11 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
+      workbox:{
+        cacheId: new Date().toISOString(),
+      },
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      includeAssets: ['favicon.ico', 'masked-icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Stoner Much',
         short_name: 'Stoner Much',

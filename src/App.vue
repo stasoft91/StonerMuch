@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import {db, Settings} from '@/database/db'
+import {db} from '@/database/db'
+import type {Settings} from '@/database/db'
 import type { Puff } from '@/database/db'
 import getTime from 'date-fns/getTime'
 import subDays from 'date-fns/subDays'
@@ -45,7 +46,7 @@ onUnmounted(() => clearInterval(intervalId))
 
 const isHelpModalOpen = ref(false);
 const isChangeTimeModalOpen = ref(false);
-let puffToBeEdited = null;
+let puffToBeEdited: Ref<Puff | undefined> = ref(undefined);
 
 const settings = useObservable(liveQuery(() => db.settings.toArray()) as any) as Ref<
     Settings[]
@@ -109,7 +110,7 @@ const onImportDataBtnClick = async () => {
 
 const unsavedItemsCount = computed(() => {
   if (computedSettings.value.lastExport) {
-    return puffsSorted.value?.filter(puff => puff.timestamp > computedSettings.value.lastExport).length || 0;
+    return puffsSorted.value?.filter(puff => puff.timestamp > (computedSettings.value.lastExport || 0)).length || 0;
   } else return 0;
 })
 
@@ -118,12 +119,16 @@ const onShowModalPress = () => {
 }
 
 const openChangeTimeDialog = (puff: Puff) => {
-  puffToBeEdited = puff;
+  puffToBeEdited.value = puff;
   isChangeTimeModalOpen.value = true;
 }
 
-const onChangeTime = (puff: Puff) => {
-  db.puffs.update(puff.id, {timestamp: puff.timestamp});
+
+const onChangePuff = (puff: Puff) => {
+  puffToBeEdited.value = puff;
+  db.puffs.update(puff.id, {
+    timestamp: getTime(puff.timestamp),
+  } as Partial<Puff>);
 }
 
 </script>
@@ -154,7 +159,7 @@ const onChangeTime = (puff: Puff) => {
     <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
   </div>
   <div v-if="isChangeTimeModalOpen" class="overlay">
-    <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangeTime" ></ModalHelp>
+    <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangePuff" ></ModalHelp>
   </div>
 </template>
 
@@ -217,7 +222,7 @@ main {
   background-color: hsl(0, 0%, 100%);
   border: 2px solid #D62F75CD;
   border-radius: 5px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 

@@ -75,6 +75,7 @@ h6 {
   9. Create a root stacking context
 */
 #root,
+#app,
 #__next {
   isolation: isolate;
 }
