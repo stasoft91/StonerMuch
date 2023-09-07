@@ -3,7 +3,7 @@ import type { Table } from 'dexie'
 import type {UsageTypesEnum} from "@/types/types";
 
 export interface Puff {
-  id: number
+  id?: number
   timestamp: number
   weight: number
   icon?: UsageTypesEnum

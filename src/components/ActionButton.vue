@@ -23,7 +23,7 @@ import getTime from "date-fns/getTime";
 import subDays from "date-fns/subDays";
 import {nextTick, ref} from "vue";
 import {onLongPress} from "@vueuse/core";
-import type { UsageTypesEnum } from "@/types/types";
+import { UsageTypesEnum } from "@/types/types";
 
 
 type PuffLogsProps = {
@@ -71,7 +71,7 @@ const addPuff = async (weight: number, icon: UsageTypesEnum) => {
     timestamp: getTime(subDays(new Date(), 0)),
     weight,
     icon,
-    temperature: parseInt(localStorage.getItem('temperature')) || 0,
+    temperature: parseInt(localStorage.getItem('temperature') || '0') || 0,
     note: ''
   })
 }
@@ -113,6 +113,9 @@ display: flex;
   position: relative;
 
   height: 100px;
+  width: 100px;
+
+  color: #111;
 }
 
 .weight {
@@ -144,6 +147,21 @@ display: flex;
 }
 
 .save {
+  background-color: #f8fffc;
+  border: 2px solid rgba(133, 214, 47, 0.25);
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #111;
+}
+
+.increase, .decrease {
   background-color: rgba(133, 214, 47, 0.15);
   border: 2px solid rgba(133, 214, 47, 0.25);
   border-radius: 5px;
@@ -155,5 +173,6 @@ display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  color: #111;
 }
 </style>

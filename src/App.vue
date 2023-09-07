@@ -9,8 +9,9 @@ import endOfDay from 'date-fns/endOfDay'
 import { useObservable } from '@vueuse/rxjs'
 import { liveQuery } from 'dexie'
 import type { Ref } from 'vue'
+import { h } from 'vue'
 import PuffLogs from '@/components/PuffLogs.vue'
-import ModalHelp from '@/components/ModalHelp.vue'
+import ModalHelp from '@/components/modals/ModalHelp.vue'
 import ActionButton from '@/components/ActionButton.vue'
 import {computed, onMounted, onUnmounted, ref} from "vue";
 import {exportDB, importInto} from "dexie-export-import";
@@ -18,19 +19,25 @@ import {DEFAULT_SETTINGS, VERSION} from "@/constants/constants";
 import { vOnLongPress } from '@vueuse/components'
 import { UsageTypesEnum } from "@/types/types";
 
-let intervalId: number;
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { Action } from 'element-plus'
+import ModalChangeTime from "@/components/modals/ModalChangeTime.vue";
+import ModalSettings from "@/components/modals/ModalSettings.vue";
+
+let intervalRefreshAllTimeValues: number;
 
 const rerenderId = ref(Math.random().toString(36).substring(3))
 
 onMounted(async () => {
-  clearInterval(intervalId)
-  intervalId = setInterval(() => {
+  clearInterval(intervalRefreshAllTimeValues)
+  intervalRefreshAllTimeValues = setInterval(() => {
     // update the time every minute
     rerenderId.value = Math.random().toString(36).substring(3)
   }, 1000 * 60)
 
   if ((await db.settings.count()) === 0) {
-    isHelpModalOpen.value = true;
+    onShowModalPress();
+
     await db.settings.add({
       id: 1,
       jointWeight: parseFloat(DEFAULT_SETTINGS.jointWeight),
@@ -42,11 +49,7 @@ onMounted(async () => {
   }
 })
 
-onUnmounted(() => clearInterval(intervalId))
-
-const isHelpModalOpen = ref(false);
-const isChangeTimeModalOpen = ref(false);
-let puffToBeEdited: Ref<Puff | undefined> = ref(undefined);
+onUnmounted(() => clearInterval(intervalRefreshAllTimeValues))
 
 const settings = useObservable(liveQuery(() => db.settings.toArray()) as any) as Ref<
     Settings[]
@@ -89,22 +92,63 @@ const onExportDataBtnClick = async () => {
   document.body.appendChild(downloadAnchorNode); // required for firefox
   downloadAnchorNode.click();
   downloadAnchorNode.remove();
+
+  ElMessage({
+    type: "success",
+    message: `Export success!`,
+  })
 }
 
 const onImportDataBtnClick = async () => {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
+
   fileInput.onchange = async () => {
     if (fileInput?.files && fileInput.files.length > 0) {
       const file = fileInput?.files[0];
 
-      if (file) {
-        db.puffs.clear();
-        db.settings.clear();
-        await importInto(db, file);
+      const backup = await exportDB(db, {prettyJson: true});
+
+      //latest puff
+      const lastPuff = await db.puffs.orderBy('timestamp').last();
+      const lastTimestamp = lastPuff?.timestamp || 0;
+
+      try {
+        // throws here if it was not json
+        const isJson = JSON.parse(await file.text());
+
+        if (file && isJson) {
+          await importInto(db, file, {clearTablesBeforeImport: true});
+
+          const newLastPuff = await db.puffs.orderBy('timestamp').last();
+
+          // if latest puff in newly exported db is older than the latest puff in the old db
+          if (newLastPuff?.timestamp && newLastPuff.timestamp < lastTimestamp) {
+            // if user wants to overwrite
+            if (confirm('Newer data already exists! Do you want to overwrite it?')) {
+              return
+            } else {
+              throw new Error('Newer data already exists!')
+            }
+          }
+        }
+
+        ElMessage({
+          type: "success",
+          message: `Import success!`,
+        })
+      } catch (e) {
+        await importInto(db, backup, {clearTablesBeforeImport: true});
+
+        console.error(e);
+        ElMessage({
+          type: "error",
+          message: `Import failed!\n${e}`,
+        })
       }
     }
   };
+
   fileInput.click();
 }
 
@@ -115,20 +159,47 @@ const unsavedItemsCount = computed(() => {
 })
 
 const onShowModalPress = () => {
-  isHelpModalOpen.value = true;
+  ElMessageBox.alert(h(ModalHelp), 'What\'s that?', {
+    // if you want to disable its autofocus
+    // autofocus: false,
+    confirmButtonText: 'Cool',
+    cancelButtonText: 'Setings',
+    showCancelButton: true,
+    distinguishCancelAndClose: true,
+    // showClose: false,
+
+    callback: (action: Action) => {
+      if (action === 'cancel') {
+        showSettingsModal();
+      }
+    },
+  })
 }
+
+const showSettingsModal = () => {
+  ElMessageBox.alert(h(ModalSettings), 'Settings',{
+    confirmButtonText: 'Cool',
+  })
+}
+
+const originalTimestamp = ref(0);
 
 const openChangeTimeDialog = (puff: Puff) => {
-  puffToBeEdited.value = puff;
-  isChangeTimeModalOpen.value = true;
-}
+  originalTimestamp.value = puff.timestamp || 0;
 
+  ElMessageBox.alert(h(ModalChangeTime, {puff}), 'Time', {
+    confirmButtonText: 'Save',
+    cancelButtonText: 'Cancel',
+    showCancelButton: true,
 
-const onChangePuff = (puff: Puff) => {
-  puffToBeEdited.value = puff;
-  db.puffs.update(puff.id, {
-    timestamp: getTime(puff.timestamp),
-  } as Partial<Puff>);
+    callback: async (action: Action) => {
+      if (action !== 'confirm') {
+        await db.puffs.update(puff.id!, {
+          timestamp: getTime(originalTimestamp.value),
+        } as Partial<Puff>);
+      }
+    },
+  })
 }
 
 </script>
@@ -136,9 +207,9 @@ const onChangePuff = (puff: Puff) => {
 <template>
   <div class="wrapper">
     <div class="settings-wrapper">
-      <button class="btn-export" @click="onExportDataBtnClick">Export Data{{unsavedItemsCount ? ` (+${unsavedItemsCount})` : ''}}</button>
-      <button class="btn-import" @click="onImportDataBtnClick">Import Data</button>
-      <button class="btn-reset" @click="onClearDataBtnClick">Clear Data</button>
+      <el-button style="border-color:#2ED6D0F9" @click="onExportDataBtnClick">Export{{unsavedItemsCount ? ` (+${unsavedItemsCount})` : ''}}</el-button>
+      <el-button style="border-color:#D6D32EF9" @click="onImportDataBtnClick">Import</el-button>
+      <el-button style="border-color:#D62F75CD" @click="onClearDataBtnClick">Clear</el-button>
     </div>
     <header>
       <h1 v-on-long-press.prevent="[onShowModalPress, {delay: 420, modifiers: { stop: true }}]">Stoner much <span class="micro-text-version">{{ VERSION }}</span></h1>
@@ -154,12 +225,6 @@ const onChangePuff = (puff: Puff) => {
         <PuffLogs class="puff-logs" :puffs="puffsSorted" :rerenderKey="rerenderId" @change-time="openChangeTimeDialog"/>
       </div>
     </main>
-  </div>
-  <div v-if="isHelpModalOpen" class="overlay">
-    <ModalHelp @close-modal="isHelpModalOpen = false" type="help" ></ModalHelp>
-  </div>
-  <div v-if="isChangeTimeModalOpen" class="overlay">
-    <ModalHelp @close-modal="isChangeTimeModalOpen = false" type="changeTime" :puff="puffToBeEdited" @change-time="onChangePuff" ></ModalHelp>
   </div>
 </template>
 
@@ -217,9 +282,7 @@ main {
 }
 
 .btn-reset, .btn-export, .btn-import {
-  padding: 0.25rem 0.5rem;
-
-  background-color: hsl(0, 0%, 100%);
+  //background-color: hsl(0, 0%, 100%);
   border: 2px solid #D62F75CD;
   border-radius: 5px;
   font-size: 0.8rem;
@@ -233,13 +296,13 @@ main {
 .btn-import {
  border: 2px solid #D6D32EF9;
 }
-
-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-direction: column;
-}
+//
+//button {
+//  display: flex;
+//  align-items: center;
+//  justify-content: space-between;
+//  flex-direction: column;
+//}
 
 .flex {
   margin-top: 2rem;
@@ -275,6 +338,12 @@ button {
   padding: 0.25rem 0.50rem 0;
 
   opacity: 0.5;
+
+  & button {
+    padding: 0.25rem 1rem;
+    color: white;
+    font-size: 1rem;
+  }
 }
 
 .micro-text-version {
