@@ -7,7 +7,17 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 /* import specific icons */
-import { faJoint, faCannabis, faBong, faBolt, faTrashAlt, faHourglassHalf, faTemperatureHalf, faNoteSticky, faClockFour } from '@fortawesome/free-solid-svg-icons'
+import {
+  faJoint,
+  faCannabis,
+  faBong,
+  faBolt,
+  faTrashAlt,
+  faHourglassHalf,
+  faTemperatureHalf,
+  faNoteSticky,
+  faClockFour
+} from '@fortawesome/free-solid-svg-icons'
 
 // @ts-ignore
 import { registerSW } from 'virtual:pwa-register'
@@ -17,7 +27,17 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import 'element-plus/dist/index.css'
 
 /* add icons to the library */
-library.add(faJoint, faCannabis, faBong, faBolt, faTrashAlt, faHourglassHalf, faTemperatureHalf, faNoteSticky, faClockFour)
+library.add(
+  faJoint,
+  faCannabis,
+  faBong,
+  faBolt,
+  faTrashAlt,
+  faHourglassHalf,
+  faTemperatureHalf,
+  faNoteSticky,
+  faClockFour
+)
 
 const app = createApp(App)
 

@@ -1,6 +1,6 @@
 import Dexie from 'dexie'
 import type { Table } from 'dexie'
-import type {UsageTypesEnum} from "@/types/types";
+import type { UsageTypesEnum } from '@/types/types'
 
 export interface Puff {
   id?: number

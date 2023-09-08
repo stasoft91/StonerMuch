@@ -1,10 +1,12 @@
 <template>
   <div>
     <div class="flex with-gap">
-      <el-input type="time" v-model="timeHM" @change="onTimeChange"/>
+      <el-input type="time" v-model="timeHM" @change="onTimeChange" />
 
       <el-button size="large" @click="moveDayBy(-1)">-1 Day</el-button>
-      <el-button size="large"  :disabled="isNextDayAfterToday" @click="moveDayBy(1)">+1 Day</el-button>
+      <el-button size="large" :disabled="isNextDayAfterToday" @click="moveDayBy(1)"
+        >+1 Day</el-button
+      >
     </div>
   </div>
 </template>
@@ -27,26 +29,26 @@
 </style>
 
 <script setup lang="ts">
-import type {Puff} from "@/database/db";
-import {computed, onMounted, ref} from "vue";
-import format from "date-fns/format";
-import getTime from "date-fns/getTime";
-import endOfDay from "date-fns/endOfDay";
-import startOfDay from "date-fns/startOfDay";
-import parse from "date-fns/parse";
-import {differenceInDays} from "date-fns";
-import {db} from "@/database/db";
+import type { Puff } from '@/database/db'
+import { computed, onMounted, ref } from 'vue'
+import format from 'date-fns/format'
+import getTime from 'date-fns/getTime'
+import endOfDay from 'date-fns/endOfDay'
+import startOfDay from 'date-fns/startOfDay'
+import parse from 'date-fns/parse'
+import { differenceInDays } from 'date-fns'
+import { db } from '@/database/db'
 
-export type ModalProps = {puff: Puff}
+export type ModalProps = { puff: Puff }
 
 const props: ModalProps = defineProps<ModalProps>()
 
-const timeHM = ref('');
-const selectedTimestamp = ref(0);
+const timeHM = ref('')
+const selectedTimestamp = ref(0)
 
 onMounted(() => {
-  selectedTimestamp.value = props.puff.timestamp;
-  timeHM.value = format(props.puff.timestamp, 'HH:mm') ?? '';
+  selectedTimestamp.value = props.puff.timestamp
+  timeHM.value = format(props.puff.timestamp, 'HH:mm') ?? ''
 })
 
 /**
@@ -55,48 +57,46 @@ onMounted(() => {
  */
 const moveDayBy = (diff: -1 | 1) => {
   if (!confirm('Are you sure?')) {
-    return;
+    return
   }
 
-  const nextDay = new Date(selectedTimestamp.value);
-  nextDay.setDate(nextDay.getDate() + diff);
+  const nextDay = new Date(selectedTimestamp.value)
+  nextDay.setDate(nextDay.getDate() + diff)
 
   //check if next day is after today
   if (diff === 1 && isNextDayAfterToday.value) {
-    return;
+    return
   }
 
-  const destinationTime = diff < 0 ? endOfDay(nextDay) : startOfDay(nextDay);
+  const destinationTime = diff < 0 ? endOfDay(nextDay) : startOfDay(nextDay)
 
   timeHM.value = format(destinationTime, 'HH:mm')
 
-  selectedTimestamp.value = getTime(destinationTime);
+  selectedTimestamp.value = getTime(destinationTime)
 
   db.puffs.update(props.puff.id!, {
-    timestamp: getTime(destinationTime),
-  } as Partial<Puff>);
+    timestamp: getTime(destinationTime)
+  } as Partial<Puff>)
 }
-
 
 /**
  * When time is changed
  */
 const onTimeChange = () => {
-  const newTime = parse(timeHM.value, 'HH:mm', new Date(selectedTimestamp.value));
+  const newTime = parse(timeHM.value, 'HH:mm', new Date(selectedTimestamp.value))
 
-  selectedTimestamp.value = getTime(newTime);
+  selectedTimestamp.value = getTime(newTime)
 
   db.puffs.update(props.puff.id!, {
-    timestamp: getTime(newTime),
-  } as Partial<Puff>);
+    timestamp: getTime(newTime)
+  } as Partial<Puff>)
 }
 
 const isNextDayAfterToday = computed(() => {
-  const timestamp = selectedTimestamp.value;
-  const nextDay = new Date(timestamp);
-  nextDay.setDate(nextDay.getDate() + 1);
+  const timestamp = selectedTimestamp.value
+  const nextDay = new Date(timestamp)
+  nextDay.setDate(nextDay.getDate() + 1)
 
   return differenceInDays(endOfDay(nextDay), endOfDay(new Date())) > 0
 })
-
 </script>

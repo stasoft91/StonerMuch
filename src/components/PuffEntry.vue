@@ -1,83 +1,103 @@
 <template>
   <div class="puff-entry">
     <p class="parameters">
-            <span class="parameter">
-              <span class="icon"><font-awesome-icon icon="fa-solid fa-clock-four fix-left-position" fixedWidth /></span>
-              <span
-                  class="editable"
-                  v-on-long-press.prevent="[() => emit('changeTime', puff), {delay: 420, modifiers: { stop: true }}]"
-              >{{ format(puff.timestamp, 'HH:mm') }}</span>
-            </span>
+      <span class="parameter">
+        <span class="icon"
+          ><font-awesome-icon icon="fa-solid fa-clock-four fix-left-position" fixedWidth
+        /></span>
+        <span
+          class="editable"
+          v-on-long-press.prevent="[
+            () => emit('changeTime', puff),
+            { delay: 420, modifiers: { stop: true } }
+          ]"
+          >{{ format(puff.timestamp, 'HH:mm') }}</span
+        >
+      </span>
       <span class="puff-actions">
-              <el-button @click="removePuff(puff.id!)" class="remove-puff"><font-awesome-icon :icon="`fa-solid fa-trash-alt`" fixedWidth /></el-button>
-            </span>
+        <el-button @click="removePuff(puff.id!)" class="remove-puff"
+          ><font-awesome-icon :icon="`fa-solid fa-trash-alt`" fixedWidth
+        /></el-button>
+      </span>
     </p>
     <p v-if="isFormatDistanceToNowVisible(puff.timestamp)">
-      <span class="icon"><font-awesome-icon :icon="`fa-solid fa-hourglass-half`" fixedWidth /></span>
-      <span :key="`${props.rerenderKey}.${puff.id}`">{{ formatDistanceToNow(puff.timestamp) }} ago</span>
+      <span class="icon"
+        ><font-awesome-icon :icon="`fa-solid fa-hourglass-half`" fixedWidth
+      /></span>
+      <span :key="`${props.rerenderKey}.${puff.id}`"
+        >{{ formatDistanceToNow(puff.timestamp) }} ago</span
+      >
     </p>
     <p class="parameters">
-            <span class="parameter">
-              <span class="icon" :class="getIconStyleClasses(puff.icon)">
-                <font-awesome-icon :icon="puff.icon" fixedWidth />
-              </span>
-              <span
-                  :data-id="puff.id"
-                  :data-weight="puff.weight.toFixed(1)"
-                  class="editable"
-                  v-on-long-press.prevent="[onChangeWeightLongPress, {delay: 420, modifiers: { stop: true }}]"
-              >
-                {{ puff.weight.toFixed(1) }}&nbsp;g
-              </span>
-            </span>
+      <span class="parameter">
+        <span class="icon" :class="getIconStyleClasses(puff.icon)">
+          <font-awesome-icon :icon="puff.icon" fixedWidth />
+        </span>
+        <span
+          :data-id="puff.id"
+          :data-weight="puff.weight.toFixed(1)"
+          class="editable"
+          v-on-long-press.prevent="[
+            onChangeWeightLongPress,
+            { delay: 420, modifiers: { stop: true } }
+          ]"
+        >
+          {{ puff.weight.toFixed(1) }}&nbsp;g
+        </span>
+      </span>
 
       <span class="parameter" v-if="puff.icon === 'bolt'">
-              <span
-                  :data-id="puff.id"
-                  :data-temperature="puff.temperature?.toFixed(1) || 0"
-                  class="editable"
-                  v-on-long-press.prevent="[onChangeTemperatureLongPress, {delay: 420, modifiers: { stop: true }}]"
-              >
-                {{ Math.abs(puff.temperature || 0) }}°
-              </span>
-              <font-awesome-icon icon="fa-solid fa-temperature-half"/>
-            </span>
+        <span
+          :data-id="puff.id"
+          :data-temperature="puff.temperature?.toFixed(1) || 0"
+          class="editable"
+          v-on-long-press.prevent="[
+            onChangeTemperatureLongPress,
+            { delay: 420, modifiers: { stop: true } }
+          ]"
+        >
+          {{ Math.abs(puff.temperature || 0) }}°
+        </span>
+        <font-awesome-icon icon="fa-solid fa-temperature-half" />
+      </span>
     </p>
-    <p class="parameters justify-center" :class="{'flex-start':puff.note}">
-            <span class="parameter">
-              <span class="icon"><font-awesome-icon :icon="`fa-solid fa-note-sticky`" fixedWidth/></span>
-              <span
-                  :data-id="puff.id"
-                  :data-note="puff.note"
-                  class="editable"
-                  v-on-long-press.prevent="[onChangeNoteLongPress, {delay: 420, modifiers: { stop: true }}]"
-              >
-                <em>{{ puff.note || 'Add' }}</em>
-              </span>
-            </span>
+    <p class="parameters justify-center" :class="{ 'flex-start': puff.note }">
+      <span class="parameter">
+        <span class="icon"><font-awesome-icon :icon="`fa-solid fa-note-sticky`" fixedWidth /></span>
+        <span
+          :data-id="puff.id"
+          :data-note="puff.note"
+          class="editable"
+          v-on-long-press.prevent="[
+            onChangeNoteLongPress,
+            { delay: 420, modifiers: { stop: true } }
+          ]"
+        >
+          <em>{{ puff.note || 'Add' }}</em>
+        </span>
+      </span>
     </p>
     <hr />
   </div>
 </template>
 
 <script setup lang="ts">
-import {vOnLongPress} from '@vueuse/components'
-import format from "date-fns/format";
-import formatDistanceToNow from "date-fns/formatDistanceToNow";
-import {db} from "@/database/db";
-import type {Puff} from "@/database/db";
-import {UsageTypesEnum} from "@/types/types";
-import {compareAsc, startOfToday} from "date-fns";
+import { vOnLongPress } from '@vueuse/components'
+import format from 'date-fns/format'
+import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import { db } from '@/database/db'
+import type { Puff } from '@/database/db'
+import { UsageTypesEnum } from '@/types/types'
+import { compareAsc, startOfToday } from 'date-fns'
 
 const emit = defineEmits(['changeTime'])
 
 type PuffEntryProps = {
-  puff: Puff,
+  puff: Puff
   rerenderKey: string
 }
 
 const props = defineProps<PuffEntryProps>()
-
 
 /**
  * Checks if time is of current day
@@ -89,7 +109,6 @@ const isFormatDistanceToNowVisible = (timestamp: number) => {
   return compareAsc(startOfToday(), new Date(timestamp)) <= 0
 }
 
-
 const removePuff = (id: number) => {
   if (confirm('Delete this puff?')) {
     db.puffs.delete(id)
@@ -97,10 +116,10 @@ const removePuff = (id: number) => {
 }
 
 const onChangeNoteLongPress = (e: PointerEvent) => {
-  const target = (e.target as HTMLElement).parentElement;
+  const target = (e.target as HTMLElement).parentElement
 
   if (!(target instanceof HTMLElement)) {
-    alert ('Something went wrong :(')
+    alert('Something went wrong :(')
     return
   }
 
@@ -114,10 +133,10 @@ const onChangeNoteLongPress = (e: PointerEvent) => {
 }
 
 const onChangeTemperatureLongPress = (e: PointerEvent) => {
-  const target = e.target as HTMLElement;
+  const target = e.target as HTMLElement
 
   if (!(target instanceof HTMLElement)) {
-    alert ('Something went wrong :(')
+    alert('Something went wrong :(')
     return
   }
 
@@ -128,17 +147,17 @@ const onChangeTemperatureLongPress = (e: PointerEvent) => {
   if (newTemperature) {
     const puffId = target.getAttribute('data-id')
     if (puffId) {
-      localStorage.setItem('temperature', newTemperature);
+      localStorage.setItem('temperature', newTemperature)
       db.puffs.update(+puffId, { temperature: +newTemperature })
     }
   }
 }
 
 const onChangeWeightLongPress = (e: PointerEvent) => {
-  const target = e.target as HTMLElement;
+  const target = e.target as HTMLElement
 
   if (!(target instanceof HTMLElement)) {
-    alert ('Something went wrong :(')
+    alert('Something went wrong :(')
     return
   }
 
@@ -156,7 +175,7 @@ const onChangeWeightLongPress = (e: PointerEvent) => {
 
 const getIconStyleClasses = (icon?: UsageTypesEnum): string => {
   // fix positioning of icon for bong
-  return (icon === UsageTypesEnum.bong) ? `fix-left-position` : ''
+  return icon === UsageTypesEnum.bong ? `fix-left-position` : ''
 }
 </script>
 

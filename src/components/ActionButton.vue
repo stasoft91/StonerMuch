@@ -1,6 +1,12 @@
 <template>
-  <button ref="htmlRefHook" class="btn-puff" :class="{'edit-mode': isEditMode}" @click="addPuff(props.weight, props.icon)">
-    <span class="plant-icon" v-if="!isEditMode"><font-awesome-icon :icon="`fa-solid fa-${props.icon}`" fixedWidth /></span
+  <button
+    ref="htmlRefHook"
+    class="btn-puff"
+    :class="{ 'edit-mode': isEditMode }"
+    @click="addPuff(props.weight, props.icon)"
+  >
+    <span class="plant-icon" v-if="!isEditMode"
+      ><font-awesome-icon :icon="`fa-solid fa-${props.icon}`" fixedWidth /></span
     ><span class="weight" v-if="props.weight && !isEditMode">
       {{ props.weight.toFixed(1) }}
     </span>
@@ -18,18 +24,17 @@
 </template>
 
 <script lang="ts" setup>
-import {db} from "@/database/db";
-import getTime from "date-fns/getTime";
-import subDays from "date-fns/subDays";
-import {nextTick, ref} from "vue";
-import {onLongPress} from "@vueuse/core";
-import { UsageTypesEnum } from "@/types/types";
-
+import { db } from '@/database/db'
+import getTime from 'date-fns/getTime'
+import subDays from 'date-fns/subDays'
+import { nextTick, ref } from 'vue'
+import { onLongPress } from '@vueuse/core'
+import { UsageTypesEnum } from '@/types/types'
 
 type PuffLogsProps = {
-  weight: number;
-  icon: UsageTypesEnum;
-  isDemoMode?: boolean;
+  weight: number
+  icon: UsageTypesEnum
+  isDemoMode?: boolean
 }
 
 const emit = defineEmits(['click', 'longpress'])
@@ -46,10 +51,10 @@ const onDecreaseWeight = async () => {
 }
 
 const onSaveNewWeight = () => {
-  nextTick(() => isEditMode.value = false)
+  nextTick(() => (isEditMode.value = false))
 }
 
-const isEditMode = ref(false);
+const isEditMode = ref(false)
 
 const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
   weight: () => 0,
@@ -58,13 +63,13 @@ const props: PuffLogsProps = withDefaults(defineProps<PuffLogsProps>(), {
 })
 
 const addPuff = async (weight: number, icon: UsageTypesEnum) => {
-  emitClick();
+  emitClick()
 
-  if (isEditMode.value) return;
-  if (props.isDemoMode) return;
+  if (isEditMode.value) return
+  if (props.isDemoMode) return
 
   if ((await db.settings.count()) === 0) {
-    return;
+    return
   }
 
   db.puffs.add({
@@ -79,26 +84,29 @@ const addPuff = async (weight: number, icon: UsageTypesEnum) => {
 const htmlRefHook = ref<HTMLElement | null>(null)
 
 const onChangeWeightLongPress = async () => {
-  if (props.isDemoMode) return;
+  if (props.isDemoMode) return
 
   emitLongPress()
 
   if ((await db.settings.count()) === 0) {
-    return;
+    return
   }
-  isEditMode.value = true;
+  isEditMode.value = true
 }
 
-onLongPress(
-    htmlRefHook,
-    onChangeWeightLongPress,
-    { modifiers: { prevent: true }, delay: 420}
-)
+onLongPress(htmlRefHook, onChangeWeightLongPress, { modifiers: { prevent: true }, delay: 420 })
 </script>
 
 <style scoped>
 .btn-puff {
-  background: linear-gradient(42deg, hsl(89, 67%, 88%), hsl(89, 67%, 94%), hsl(121, 67%, 98%), hsl(89, 67%, 96%), hsl(89, 67%, 82%));
+  background: linear-gradient(
+    42deg,
+    hsl(89, 67%, 88%),
+    hsl(89, 67%, 94%),
+    hsl(121, 67%, 98%),
+    hsl(89, 67%, 96%),
+    hsl(89, 67%, 82%)
+  );
   border: 1px solid #85d62fff;
   box-shadow: inset 0 0 4px hsl(155, 67%, 51%);
 
@@ -106,7 +114,7 @@ onLongPress(
   padding: 10px 20px;
   cursor: pointer;
   font-size: 2.5rem;
-display: flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -161,7 +169,8 @@ display: flex;
   color: #111;
 }
 
-.increase, .decrease {
+.increase,
+.decrease {
   background-color: rgba(133, 214, 47, 0.15);
   border: 2px solid rgba(133, 214, 47, 0.25);
   border-radius: 5px;
